@@ -1,119 +1,118 @@
-﻿<?php
-?> 
+
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-</head>
-<body> 
-    
-<?php
-//dados do banco
-$hostname = '186.202.152.51';
-$user = 'unasp43';
-$pass = 'un@sp43';
-$dbase = 'unasp43';
-$con = null;
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body> 
 
+        <?php
+//dados do banco
+        $hostname = '127.0.0.1';
+        $user = 'root';
+        $pass = '';
+        $dbase = 'formularios';
+        $con = null;
 
 //varias que recebem os dados do formulÃ¡rio
-$nome = $_POST['nome'] ? $_POST['nome'] : "";
-$sobrenome = $_POST['sobrenome'] ? $_POST['sobrenome'] : "";
-$telefone = (isset($_POST['telefone'])) ? $_POST['telefone'] : "";
-$email = (isset($_POST['email'])) ? $_POST['email'] : "";
-$oficina = (isset($_POST['oficina'])) ? $_POST['oficina'] : "";
-$ra = (isset($_POST['ra'])) ? $_POST['ra'] : "";
-$semestre = (isset($_POST['semestre'])) ? $_POST['semestre'] : "";
-$curso = (isset($_POST['curso'])) ? $_POST['curso'] : "";
+        $nome = $_POST['nome_full'] ? $_POST['nome_full'] : "";
+        $RG = $_POST['rg'] ? $_POST['rg'] : "";
+        $nascimento = $_POST['d_nasc'] ? $_POST['d_nasc'] : "";
+        $email = $_POST['email'] ? $_POST['email'] : "";
+        $endereco = $_POST['endereco'] ? $_POST['endereco'] : "";
+        $complemento = $_POST['complemento'] ? $_POST['complemento'] : "";
+        $cidade = $_POST['cidade'] ? $_POST['cidade'] : "";
+        $cep = $_POST['cep'] ? $_POST['cep'] : "";
+        $participante = $_POST['participante'] ? $_POST['participante'] : "";
+        $modalidade = $_POST['modalidade'] ? $_POST['modalidade'] : "";
+        $reserva = $_POST['reserva_onibus'] ? $_POST['reserva_onibus'] : "";
+
+
+        $reservaMensagem = "";
+        if (isset($reserva)) {
+            $reservaMensagem = "SIM";
+        } else {
+            $reservaMensagem = "NÃO.";
+        }
 
 //Abre a conexÃ£o com o banco 
-$con = mysql_connect($hostname, $user, $pass); // conexÃ£o
-mysql_select_db($dbase); // seleciona o banco
+        $con = mysql_connect($hostname, $user, $pass); // conexÃ£o
+        mysql_select_db($dbase); // seleciona o banco
 //seta todos em utf8
-mysql_query("SET character_set_connection=utf8");
-mysql_query("SET character_set_client=utf8");
-mysql_query("SET character_set_results=utf8");
-
-//Obtem os dados da tabela oficina
-$pegaOficina = mysql_query("SELECT * FROM secone WHERE oficina = '$oficina'");
-$resultOficina = mysql_num_rows($pegaOficina);
-//Obtem os dados da tabela email
-$pegaEmail = mysql_query("SELECT * FROM secone WHERE email = '$email'");
-// pega um resultado dos dados do email
-$resultEmail = mysql_num_rows($pegaEmail);
-//variável que recebe o post_ra caso ele exista
-$resultRA = null;
-
-//caso exista o post_ra $resultRa recebe
-if (!empty($ra)) {
-    $pegaRa = mysql_query("SELECT * FROM secone WHERE ra = '$ra'");
-    $resultRA = mysql_num_rows($pegaRa);
-}
+        mysql_query("SET character_set_connection=utf8");
+        mysql_query("SET character_set_client=utf8");
+        mysql_query("SET character_set_results=utf8");
 
 
-if($resultEmail > 0){?>
-     <script>
-        alert("Email já cadastrado nessa oficina");
-        location.href="http://www.unasp-ec.com/secone/";
-    </script>
-<?php
-}else if ($resultOficina == 55) { ?>
-    <script>
-        alert("Já foram preenchidas o numero de vagas para essa oficina");
-        location.href="http://www.unasp-ec.com/secone/";
-    </script>
+ // faz verficação se email e rg já estão cadastrados
+        
+        $pegaRG = mysql_query("SELECT * FROM unasport WHERE rg = '$RG'");
+        $resultRG = mysql_num_rows($pegaRG);
 
-<?php
-}
+        $pegaEmail = mysql_query("SELECT * FROM unasport WHERE email = '$email'");
+        $resultEmail = mysql_num_rows($pegaEmail);
 
-//verifica se o RA existe no sistema
-else if ($resultRA > 0) {
-    ?>
-       <script>
-        alert("RA já cadastrado nessa oficina");
-        location.href="http://www.unasp-ec.com/secone/";
-    </script>
-    <?php
-} else {
-    
-//executa a query no bancoI 
-   $sql = "INSERT INTO secone (id,nome,sobrenome,telefone,email,oficina,ra,curso,semestre) VALUES (NULL,'" . $nome . "','" . $sobrenome . "','" . $telefone . "','" . $email . "','" . $oficina . "','" . $ra . "','" . $curso . "','" . $semestre . "')";
-    $db = mysql_query($sql);
-    //executa a query no banco
-    if ($db) {
-        $from = 'noreply@unasp-ec.com';
-        $to = "wanderley.gazeta@unasp.edu.br";
-        $headers = "From: SECONE <noreply@unasp-ec.com>\r\n";
-        $headers .= "MIME-Version: 1.0\n";
-        $headers .= "Content-type: text/html; charset=ISO-8859-1\r\n";
-        $headers .= sprintf('Return-Path: %s%s', $from, PHP_EOL);
-        $headers .= sprintf('Reply-To: %s%s', $from, PHP_EOL);
-        $headers .= sprintf('X-Priority: %d%s', 3, PHP_EOL);
-        $headers .= sprintf('X-Mailer: PHP/%s%s', phpversion(), PHP_EOL);
-        $headers .= sprintf('Disposition-Notification-To: %s%s', $from, PHP_EOL);
-        $subject = utf8_decode('Cadastro Secone ' . $assunto);
-        $mensagem = utf8_decode('Olá¡ ' . $nome . '! Seu Cadastro foi efetuado com sucesso');
-        $assunto = 'II SECONE';
-        $mensagem = "O cadastro de <b>".$nome."</b> foi realizado com sucesso!</br>";
-		$mensagem .= "SEUS DADOS:</br>";
-		$mensagem .= "NOME: ".$nome."</br>";
-		$mensagem .= "TELEFONE:".$telefone."</br>";
-		$mensagem .= "EMAIL: ".$email."</br>";
-		$mensagem .= "OFICINA: ".$oficina."</br>";
-		$mensagem .= "RA: ".$ra."</br>";
-		$mensagem .= "CURSO: ".$curso."</br>";
-		$mensagem .= "SEMESTRE: ".$semestre."</br>";
-		$mensagem .= "Para visualizar todas as inscrições acesse <a href='http://www.unasp-ec.com/secone/inscritos.php'>AQUI</a></br>";
 
-        if (mail($to, $subject, $mensagem, $headers)) {
-		?>
+        if ($resultEmail > 0) {
+            ?>
             <script>
-				alert("Cadastro realizado com sucesso");
-				location.href="http://www.unasp-ec.com/secone/";
-			</script>
-	<?php
+                alert("Email já cadastrado nessa oficina");
+                location.href = "http://l o calhost/unasport/";
+            </script>
+        <?php } else if ($resultRG > 0) {
+            ?>
+            <script>
+                alert("RG já cadastrado no evento");
+                location.href = "http://l o calhost/unasport/";
+            </script>
+            <?php
         } else {
-				echo 'EMAIL FALHOU';
+
+//executa a query no banco
+            
+            $sql = "INSERT INTO `formularios`.`unasport` (`id`, `nome`, `rg`, `nascimento`, `email`, `endereco`, `complemento`, `cidade`, `cep`, `participante`, `modalidade`, `reserva`) VALUES ("
+                    . "NULL, '" . $nome . "', '" . $RG . "', '" . $nascimento . "', '" . $email . "', '" . $endereco . "', '" . $complemento . "', '" . $cidade . "', '" . $cep . "', '" . $participante . "', '" . $modalidade . "', '" . $reserva . "');";
+
+            $db = mysql_query($sql);
+            
+            // Se tudo ocorrer bem no banco prepara os dados para enviar por mensagem
+            
+            if ($db) {
+                $from = 'noreply@unasp-ec.com';
+                $to = "padilhamidia@hotmail.com";
+                $headers = "From: UNASPORT <noreply@unasp-ec.com>\r\n";
+                $headers .= "MIME-Version: 1.0\n";
+                $headers .= "Content-type: text/html; charset=ISO-8859-1\r\n";
+                $headers .= sprintf('Return-Path: %s%s', $from, PHP_EOL);
+                $headers .= sprintf('Reply-To: %s%s', $from, PHP_EOL);
+                $headers .= sprintf('X-Priority: %d%s', 3, PHP_EOL);
+                $headers .= sprintf('X-Mailer: PHP/%s%s', phpversion(), PHP_EOL);
+                $headers .= sprintf('Disposition-Notification-To: %s%s', $from, PHP_EOL);
+                $subject = utf8_decode('Confirmção de Inscrição UNASPORT ' . $assunto);
+                $mensagem = utf8_decode('Olá¡ ' . $nome . '! Seu Cadastro foi efetuado com sucesso');
+                $assunto = 'II SECONE';
+                $mensagem = "O cadastro de <b>" . $nome . "</b> foi realizado com sucesso!</br>";
+                $mensagem .= "SEUS DADOS:</br>";
+                $mensagem .= "NOME: " . $nome . "</br>";
+                $mensagem .= "DATA DE NASCIMENTO:" . $nascimento . "</br>";
+                $mensagem .= "RG:" . $RG . "</br>";
+                $mensagem .= "EMAIL: " . $email . "</br>";
+                $mensagem .= "ENDEREÇO: " . $endereco . "</br>";
+                $mensagem .= "COMPLEMENTO: " . $complemento . "</br>";
+                $mensagem .= "CIDDADE: " . $cidade . "</br>";
+                $mensagem .= "CEP: " . $cep . "</br>";
+                $mensagem .= "MODALIDADE: " . $modalidade . "</br>";
+                $mensagem .= "RESERVA PARA ÔNIBUS: " . $reservaMensagem . "</br>";
+
+                if (mail($to, $subject, $mensagem, $headers)) {
+                    ?>
+                    <script>
+                        alert("Cadastro realizado com sucesso");
+                        location.href = "http://w w w.unasp-ec.com/secone/";
+                    </script>
+            <?php
+        } else {
+            echo 'EMAIL FALHOU';
         }
         //Encerra a conexÃ£o
         mysql_close();
@@ -122,5 +121,5 @@ else if ($resultRA > 0) {
     }
 }
 ?>
-</body>
+    </body>
 </html>
