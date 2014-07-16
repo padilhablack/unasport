@@ -1,0 +1,11 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*div, ul ,li, a, h1, h2, h3, h4, h5, h6, form, input,p{border:solid 1px #000000;}*/
+
+*{margin:0; padding:0; font-family: 'Champagne&LimousinesRegular';}
+
+.geral{
+	width:100%;
+	overflow:hidden;
+	}
